@@ -1,99 +1,63 @@
-from random import randint, choice
-
-def chkwin():
-    if (wealth > 100) and (credit == 0):
-        print("Вы выиграли!")
-        exit(0)
-
-def chklose():
-    if (credit == 100):
-        print("Вы проиграли!")
-        exit(1)
+# -*- coding: utf-8 -*-
+from world import World
+from company import Company
 
 def help():
-    print('''Список комманд:
-    q - выход,
-    h - эта помощь,
-    s - информация о Вашем бизнесе,
-    w - ждать следующей даты,
-    gw - взять деньги в долг, требуется 1 ход,
-    rw - вернуть деньги, требуется 1 ход,
-    b - купить товар,
-    d - продать товар''')
+    print('''РЎРїРёСЃРѕРє РєРѕРјРјР°РЅРґ:
+    q - РІС‹С…РѕРґ,
+    h - СЌС‚Р° РїРѕРјРѕС‰СЊ,
+    s - РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ Р’Р°С€РµРј Р±РёР·РЅРµСЃРµ,
+    w - Р¶РґР°С‚СЊ СЃР»РµРґСѓСЋС‰РµР№ РґР°С‚С‹,
+    gw - РІР·СЏС‚СЊ РґРµРЅСЊРіРё РІ РґРѕР»Рі, С‚СЂРµР±СѓРµС‚СЃСЏ 1 С…РѕРґ,
+    rw - РІРµСЂРЅСѓС‚СЊ РґРµРЅСЊРіРё, С‚СЂРµР±СѓРµС‚СЃСЏ 1 С…РѕРґ,
+    b - РєСѓРїРёС‚СЊ С‚РѕРІР°СЂ,
+    d - РїСЂРѕРґР°С‚СЊ С‚РѕРІР°СЂ''')
 
-def stat():
-    global date, wealth, credit, percent, price, goody_qty
-    print('Дата: %d' % date)
-    print('У Вас %d денег' % wealth)
-    print('Ваш долг: %d денег' % credit)
-    print('Проценты по долгу: %d' % percent)
-    print('Цена товара: %d' % price)
-    print('Количество товара: %d' % goody_qty)
+def player_command():
+    return input('you@yourbussiness> ')
 
-date = 0
-wealth = 0
-credit = 0
-percent = 0
-price = 1
-goody_qty = 0
+world = World(Company(player_command))
 
-def ontime():
-    global date, credit, percent, price
-    # меняется дата
-    date += 1
-    # увеличение долга по кредиту
-    credit = int(credit * (100 + percent) / 100)
-    # изменение процентов по кредиту в этом ходу
-    percent += randint(-5, 5)
-    # изменение стоимости товаров в этом ходу
-    price += randint(-3, 3)
-    if percent < 0:
-        percent = 0
-    if price < 1:
-        price = 1
-    stat()
-    # проверка условий победы и поражения
-    chkwin()
-    chklose()
+aicmd = ['w', 'gw', 'rw', 'b', 'd']
 
-quit = False
-while not quit:
-    command = input('you@yourbussiness> ')
+while not world.quit:
+    command = world.company.get_command()
     if command == 'q':
-        quit = True
+        world.quit = True
     elif command == 'h':
         help()
     elif command == 's':
-        stat()
+        world.info()
     elif command == 'w':
-        ontime()
+        world.ontime()
     elif command == 'gw':
-        wealth += 1
-        credit += 1
-        ontime()
+        world.company.money += 1
+        world.company.credit += 1
+        print('test')
+        world.ontime()
     elif command == 'rw':
-        if wealth < 1:
-            print('Недостаточно денег!')
+        if world.company.money < 1:
+            print('РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РґРµРЅРµРі!')
             continue
-        wealth -= 1
-        credit -= 1
-        ontime()
+        world.company.money -= 1
+        world.company.credit -= 1
+        world.ontime()
     elif command == 'b':
-        if wealth < price:
-            print('Недостаточно денег!')
+        if world.company.money < world.price:
+            print('РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РґРµРЅРµРі!')
             continue
-        wealth -= price
-        goody_qty += 1
-        ontime()
+        world.company.money -= world.price
+        world.company.goody += 1
+        world.ontime()
     elif command == 'd':
         count = 0
         sell_price = 0
-        while (choice('yn') == 'y') and (goody_qty > 0):
-            goody_qty -= 1
-            sell_price = int(price * 1.2) + 1
-            wealth += sell_price
+        while (choice('yn') == 'y') and (world.company.goody > 0):
+            world.company.goody -= 1
+            sell_price = int(world.price * 1.2) + 1
+            world.company.money += sell_price
             count += 1
-        print("Вы продали %d товаров по цене %d" % (count, sell_price))
-        ontime()
+        print("Р’С‹ РїСЂРѕРґР°Р»Рё %d С‚РѕРІР°СЂРѕРІ РїРѕ С†РµРЅРµ %d" % (count, sell_price))
+        world.ontime()
     else:
-        print('Команда не найдена')
+        print('РљРѕРјР°РЅРґР° РЅРµ РЅР°Р№РґРµРЅР°')
