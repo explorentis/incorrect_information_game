@@ -1,4 +1,14 @@
-from random import randint
+from random import randint, choice
+
+def chkwin():
+    if (wealth > 100) and (credit == 0):
+        print("Вы выиграли!")
+        exit(0)
+
+def chklose():
+    if (credit == 100):
+        print("Вы проиграли!")
+        exit(1)
 
 def help():
     print('''Список комманд:
@@ -9,7 +19,7 @@ def help():
     gw - взять деньги в долг, требуется 1 ход,
     rw - вернуть деньги, требуется 1 ход,
     b - купить товар,
-    s - продать товар''')
+    d - продать товар''')
 
 def stat():
     global date, wealth, credit, percent, price, goody_qty
@@ -29,21 +39,28 @@ goody_qty = 0
 
 def ontime():
     global date, credit, percent, price
+    # меняется дата
     date += 1
+    # увеличение долга по кредиту
     credit = int(credit * (100 + percent) / 100)
+    # изменение процентов по кредиту в этом ходу
     percent += randint(-5, 5)
+    # изменение стоимости товаров в этом ходу
     price += randint(-3, 3)
     if percent < 0:
         percent = 0
     if price < 1:
         price = 1
     stat()
+    # проверка условий победы и поражения
+    chkwin()
+    chklose()
 
-exit = False
-while not exit:
+quit = False
+while not quit:
     command = input('you@yourbussiness> ')
     if command == 'q':
-        exit = True
+        quit = True
     elif command == 'h':
         help()
     elif command == 's':
@@ -66,8 +83,17 @@ while not exit:
             print('Недостаточно денег!')
             continue
         wealth -= price
-        goody_qty +  1
+        goody_qty += 1
         ontime()
-            
+    elif command == 'd':
+        count = 0
+        sell_price = 0
+        while (choice('yn') == 'y') and (goody_qty > 0):
+            goody_qty -= 1
+            sell_price = int(price * 1.2) + 1
+            wealth += sell_price
+            count += 1
+        print("Вы продали %d товаров по цене %d" % (count, sell_price))
+        ontime()
     else:
         print('Команда не найдена')
