@@ -1,13 +1,29 @@
 # -*- coding: utf-8 -*-
+from random import choice
+
+def genname():
+    def genchar():
+        return choice('ЦУКЕНГШЩЗХФВАПРОЛДЖЭЯЧСМИТБЮ')
+    return ''.join([genchar() for i in range(0, 4)])
+
 class Company:
-    def __init__(self, control):
+    def __init__(self, control, show_msg=False):
+        self.name = genname()
         self.money = 0
         self.credit = 0
         self.goody = 0
+        self.show_messages = show_msg
         # Указатель на функцию, возвращающую выбранное действие
-        self.get_command = control
+        self.control = control
+        self.last_command = ''
+        # Флаг того, что данная компания сделала свой ход
+        self.turn_finished = False
     
-    def info(self):
-        print('У Вас %d денег' % self.money)
-        print('Ваш долг: %d денег' % self.credit)
-        print('Количество товара: %d' % self.goody)
+    def info(self, forced=False):
+        if self.show_messages or forced:
+            print('%s: У Вас %d денег' % (self.name, self.money))
+            print('%s: Ваш долг: %d денег' % (self.name, self.credit))
+            print('%s: Количество товара: %d' % (self.name, self.goody))
+
+    def get_command(self):
+        self.last_command = self.control()
