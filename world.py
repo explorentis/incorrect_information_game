@@ -22,6 +22,12 @@ class World:
         # увеличение долга по кредиту
         for c in self.companies:
             c.credit = int(c.credit * (100 + self.percent) / 100)
+            # Трата на еду:
+            if c.money > self.price:
+                c.money -= self.price
+            else:
+                c.credit += self.price
+            # .
         # изменение процентов по кредиту в этом ходу
         self.percent += randint(-5, 5)
         # изменение стоимости товаров в этом ходу

@@ -2,67 +2,7 @@
 from random import choice
 from world import World
 from company import Company
-
-def quit_game(world, company):
-    world.quit = True
-
-def help(world, company):
-    print('''Список комманд:
-    q - выход,
-    h - эта помощь,
-    s - информация о Вашем бизнесе,
-    w - ждать следующей даты,
-    gw - взять деньги в долг, требуется 1 ход,
-    rw - вернуть деньги, требуется 1 ход,
-    b - купить товар,
-    d - продать товар,
-    sf - вывести инфо обо всех организациях''')
-
-def get_money(world, company):
-    company.money += 1
-    company.credit += 1
-    company.turn_finished = True
-
-def return_money(world, company):
-    if company.money < 1:
-        if  company.show_messages:
-            print('%s: Недостаточно денег!' % company.name)
-        return
-    company.money -= 1
-    company.credit -= 1
-    company.turn_finished = True
-
-def buy(world, company):
-    if company.money < world.price:
-        if  company.show_messages:
-            print('%s: Недостаточно денег!' % company.name)
-        return
-    company.money -= world.price
-    company.goody += 1
-    company.turn_finished = True
-    
-def sell(world, company):
-    count = 0
-    sell_price = 0
-    while (choice('yn') == 'y') and (company.goody > 0):
-        company.goody -= 1
-        sell_price = int(world.price * 1.2) + 1
-        company.money += sell_price
-        count += 1
-    if  company.show_messages:
-        print("%s: Вы продали %d товаров по цене %d на сумму %d" 
-              % (company.name, count, sell_price, count * sell_price))
-    company.turn_finished = True
-
-def world_info(world, company):
-    world.info()
-
-def world_info_forced(world, company):
-    world.info(True)
-
-    
-def world_ontime(world, company):
-    company.turn_finished = True
+from commands import *
     
 def player_command():
     return input('you@yourbussiness> ')
@@ -70,7 +10,7 @@ def player_command():
 aicmd = ['w', 'gw', 'rw', 'b', 'd']
 
 def random_command():
-    return choice(['w', 'gw', 'rw', 'b', 'd'])
+    return choice(aicmd)
 
 world = World([
     Company(player_command, True),
@@ -98,8 +38,14 @@ while not world.quit:
     for c in world.companies:
         if (((new_turn == False) and (c.turn_finished == False)) or new_turn == True):
             c.get_command()
-            if c.last_command in commands.keys():
-                commands[c.last_command](world, c)
+            a = c.last_command.split(' ')
+            cmd = a[0]
+            if len(a) == 2:
+                value = a[1]
+            else:
+                value = 1
+            if cmd in commands.keys():
+                commands[cmd](world, c, int(value))
             else:
                 print("%s: нет такой команды" % c.name)
             if c.turn_finished == False:
