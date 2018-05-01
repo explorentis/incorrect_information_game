@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Список команд управления
-from random import choice
+from random import choice, randint
 
 def quit_game(world, company, value=None):
     world.quit = True
@@ -43,7 +43,7 @@ def buy(world, company, value=1):
 def sell(world, company, value=None):
     count = 0
     sell_price = 0
-    while (choice('yn') == 'y') and (company.goody > 0):
+    while (randint(0, 3) != 0) and (company.goody > 0):
         company.goody -= 1
         sell_price = int(world.price * 1.2) + 1
         company.money += sell_price

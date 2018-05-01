@@ -8,6 +8,8 @@ def genname():
 
 class Company:
     def __init__(self, control, show_msg=False):
+        # Указатель на мир, которому принадлежит компания (для получения цен и т.д.)
+        self.world = None
         self.name = genname()
         self.money = 0
         self.credit = 0
@@ -27,4 +29,4 @@ class Company:
             print('%s: Последнее действие: %s' % (self.name, self.last_command))
 
     def get_command(self):
-        self.last_command = self.control()
+        self.last_command = self.control(self)

@@ -7,6 +7,8 @@ class World:
         self.percent = 0
         self.price = 1
         self.companies = companies
+        for c in self.companies:
+            c.world = self
         self.quit = False
     
     def info(self, forced=False):
@@ -49,6 +51,7 @@ class World:
 
     def chklose(self):
         for c in self.companies:
-            if (c.credit == 100) and (c.show_messages):
-                print("%s: Вы проиграли!" % c.name)
+            if c.credit > 100:
+                if c.show_messages:
+                    print("%s: Вы проиграли!" % c.name)
                 self.quit = True

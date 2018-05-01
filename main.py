@@ -4,18 +4,33 @@ from world import World
 from company import Company
 from commands import *
     
-def player_command():
+def semiai_command(company):
+    if (company.money < company.world.price) and (company.goody == 0):
+        return 'gw 70'
+    elif (company.credit + (company.world.price * 5) < company.money) and (company.credit > 0):
+        return 'rw ' + str(company.credit)
+    elif (company.credit > 70) and (company.goody > 5):
+        return 'rw ' + str(company.money)
+    elif (company.money != 0) and (company.goody == 0):
+        return 'b ' + str(int(company.money /(2 * company.world.price)))
+    elif company.goody != 0:
+        return 'd'
+    else:
+        return 'w'
+    
+def player_command(company):
     return input('you@yourbussiness> ')
 
 aicmd = ['w', 'gw', 'rw', 'b', 'd']
 
-def random_command():
+def random_command(company):
     return choice(aicmd)
 
 world = World([
+    Company(semiai_command),
+    Company(semiai_command, True),
     Company(player_command, True),
-    Company(random_command),
-    Company(random_command),
+    Company(random_command, True),
     Company(random_command)
 ])
 
@@ -35,6 +50,7 @@ commands = {
 
 new_turn = True
 while not world.quit:
+    #input('waiting...>')
     for c in world.companies:
         if (((new_turn == False) and (c.turn_finished == False)) or new_turn == True):
             c.get_command()
