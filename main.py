@@ -3,35 +3,43 @@ from random import choice
 from world import World
 from company import Company
 from commands import *
+
+
+class Director:
+    def __init__(self, command_function):
+        self.command = command_function
+        self.company = None
+        self.last_command = None
     
-def semiai_command(company):
-    if (company.money < company.world.price) and (company.goody == 0):
+    def get_command(self):
+        self.last_command = self.command(self)
+
+    
+def semiai_command(director):
+    money = director.company.money
+    price = director.company.world.price
+    product_amount = director.company.goody
+    credit = director.company.credit
+    if (money < price) and (product_amount == 0):
         return 'gw 70'
-    elif (company.credit + (company.world.price * 5) < company.money) and (company.credit > 0):
-        return 'rw ' + str(company.credit)
-    elif (company.credit > 70) and (company.goody > 5):
-        return 'rw ' + str(company.money)
-    elif (company.money != 0) and (company.goody == 0):
-        return 'b ' + str(int(company.money /(2 * company.world.price)))
-    elif company.goody != 0:
+    elif (credit + (price * 5) < money) and (credit > 0):
+        return 'rw ' + str(credit)
+    elif (credit > 70) and (product_amount > 5):
+        return 'rw ' + str(money)
+    elif (money != 0) and (product_amount == 0):
+        return 'b ' + str(int(money /(2 * price)))
+    elif product_amount != 0:
         return 'd'
     else:
         return 'w'
     
-def player_command(company):
+def player_command(director):
     return input('you@yourbussiness> ')
 
-aicmd = ['w', 'gw', 'rw', 'b', 'd']
-
-def random_command(company):
-    return choice(aicmd)
-
 world = World([
-    Company(semiai_command),
-    Company(semiai_command, True),
-    Company(player_command, True),
-    Company(random_command, True),
-    Company(random_command)
+    # Company(semiai_command),
+    Company(Director(semiai_command), True),
+    # Company(Director(player_command), True)
 ])
 
 
@@ -50,11 +58,10 @@ commands = {
 
 new_turn = True
 while not world.quit:
-    #input('waiting...>')
     for c in world.companies:
         if (((new_turn == False) and (c.turn_finished == False)) or new_turn == True):
             c.get_command()
-            a = c.last_command.split(' ')
+            a = c.director.last_command.split(' ')
             cmd = a[0]
             if len(a) == 2:
                 value = a[1]

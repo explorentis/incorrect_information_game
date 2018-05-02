@@ -7,7 +7,7 @@ def genname():
     return ''.join([genchar() for i in range(0, randint(2, 6))])
 
 class Company:
-    def __init__(self, control, show_msg=False):
+    def __init__(self, director, show_msg=False):
         # Указатель на мир, которому принадлежит компания (для получения цен и т.д.)
         self.world = None
         self.name = genname()
@@ -16,8 +16,8 @@ class Company:
         self.goody = 0
         self.show_messages = show_msg
         # Указатель на функцию, возвращающую выбранное действие
-        self.control = control
-        self.last_command = ''
+        self.director = director
+        self.director.company = self
         # Флаг того, что данная компания сделала свой ход
         self.turn_finished = False
     
@@ -26,7 +26,7 @@ class Company:
             print('%s: У Вас %d денег' % (self.name, self.money))
             print('%s: Ваш долг: %d денег' % (self.name, self.credit))
             print('%s: Количество товара: %d' % (self.name, self.goody))
-            print('%s: Последнее действие: %s' % (self.name, self.last_command))
+            print('%s: Последнее действие: %s' % (self.name, self.director.last_command))
 
     def get_command(self):
-        self.last_command = self.control(self)
+        self.director.get_command()
