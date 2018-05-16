@@ -1,83 +1,53 @@
 # -*- coding: utf-8 -*-
-from random import choice
-from world import World
+# Copyright © 2018 Sergei Kuznetsov. All rights reserved.
 from company import Company
-from commands import *
 
+from director import Director
 
-class Director:
-    def __init__(self, command_function):
-        self.command = command_function
-        self.company = None
-        self.last_command = None
-    
-    def get_command(self):
-        self.last_command = self.command(self)
+from game import run_game
 
-    
-def semiai_command(director):
-    money = director.company.money
-    price = director.company.world.price
-    product_amount = director.company.goody
-    credit = director.company.credit
-    if (money < price) and (product_amount == 0):
-        return 'gw 70'
-    elif (credit + (price * 5) < money) and (credit > 0):
-        return 'rw ' + str(credit)
-    elif (credit > 70) and (product_amount > 5):
-        return 'rw ' + str(money)
-    elif (money != 0) and (product_amount == 0):
-        return 'b ' + str(int(money /(2 * price)))
-    elif product_amount != 0:
-        return 'd'
-    else:
-        return 'w'
-    
-def player_command(director):
-    return input('you@yourbussiness> ')
+import players
 
-world = World([
-    # Company(semiai_command),
-    Company(Director(semiai_command), True),
-    # Company(Director(player_command), True)
-])
+from world import World
 
+answer = input('Это экономическая игра, в которой вы управляете предприятием\n\
+Для того, чтобы получить больше информации (в том числе и о правилах игры)\
+загляните в файл README.txt\n\
+Укажите, что хотите:\n\
+                1) Запустить игру\n\
+                2) Расчитать параметры для AI, написанного Вами(см.howtodev)\n\
+любой другой ввод) Выход\n\
+Ваш выбор> ')
 
-commands = {
-    'q': quit_game,
-    'h': help,
-    's': world_info,
-    'w': world_ontime,
-    'gw': get_money,
-    'rw': return_money,
-    'b': buy,
-    'd': sell,
-    'sf': world_info_forced
-}
+if answer == '1':
+    player_count = input('Введите количество игроков> ')
+    company_list = []
+    for i in range(0, int(player_count)):
+        print('Игрок %d. Выберите, кто будет им управлять:' % (i + 1))
+        for j in range(0, len(players.players_list)):
+            print('%d) %s' % (j + 1, players.players_list[j]))
+        selected_player = int(input('Введите номер> ')) - 1
+        print(selected_player)
+        visible_info = input('Вы хотите видить его ходы? (1 - да) > ')
+        if visible_info == '1':
+            visible_info = True
+        else:
+            visible_info = False
+        company_list.append(
+            Company(Director(players.func_list[selected_player]),
+                    visible_info))
 
-
-new_turn = True
-while not world.quit:
-    for c in world.companies:
-        if (((new_turn == False) and (c.turn_finished == False)) or new_turn == True):
-            c.get_command()
-            a = c.director.last_command.split(' ')
-            cmd = a[0]
-            if len(a) == 2:
-                value = a[1]
-            else:
-                value = 1
-            if cmd in commands.keys():
-                commands[cmd](world, c, int(value))
-            else:
-                print("%s: нет такой команды" % c.name)
-            if c.turn_finished == False:
-                new_turn = False
-    new_turn = True
-    for c in world.companies:
-        if c.turn_finished == False:
-            new_turn = False
-    if new_turn == True:
-        world.ontime()
-        for c in world.companies:
-            c.turn_finished = False
+    world = World(company_list)
+    run_game(world)
+elif answer == '2':
+    from calculation import calc
+    from players.semiai import semiai_command
+    calc(semiai_command, 100, {'credit_sum': (70, 90),
+                               'money_for_product_reserve': (0, 10)})
+else:
+    print('Пока!')
+    try:
+        exit(0)
+    except SystemExit:
+        print('Вы поймали SystemExit, вероятно Вы запустили это приложение\
+через IDLE или Wing')
