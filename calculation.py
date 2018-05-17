@@ -50,7 +50,10 @@ def recur_calc(parameters_list,
                 else:
                     loses += 1
                 n -= 1
-            strings.send_text(strings.AI_WIN_RESULT % (wins, nrun, str(current_val), ''))
+            strings.send_text(strings.AI_WIN_RESULT % (wins,
+                                                       nrun,
+                                                       str(current_val),
+                                                       ''))
             logfile.write(strings.AI_WIN_RESULT
                           % (wins, nrun, str(current_val), '\n'))
             if top_plays:

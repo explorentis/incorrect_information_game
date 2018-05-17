@@ -2,6 +2,8 @@
 # Copyright © 2018 Sergei Kuznetsov. All rights reserved.
 from random import randint
 
+import strings
+
 
 class World:
     def __init__(self, companies, hideoutput=False):

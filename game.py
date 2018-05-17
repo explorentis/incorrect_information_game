@@ -2,6 +2,8 @@
 # Copyright © 2018 Sergei Kuznetsov. All rights reserved.
 import commands
 
+import strings
+
 
 def run_game(world):
     new_turn = True
@@ -18,7 +20,7 @@ def run_game(world):
                 if cmd in commands.commands_list.keys():
                     commands.commands_list[cmd](world, c, int(value))
                 else:
-                    strings.send_text(strigs.COMMAND_IS_NOT_EXIST % c.name)
+                    strings.send_text(strings.COMMAND_IS_NOT_EXIST % c.name)
                 if not c.turn_finished:
                     new_turn = False
         new_turn = True

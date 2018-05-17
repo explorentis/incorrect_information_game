@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 # Copyright © 2018 Sergei Kuznetsov. All rights reserved.
+
+
 def send_text(text):
     print(text)
-    
+
+
 # В этих 2 переменных последний %s - для символа конца строки при записи в файл
 AI_WIN_RESULT = 'Побед: %d из %d с заданными параметрами %s%s'
 BEST_AI_RESULT = 'Лучшие результаты: %s%s'

@@ -53,8 +53,10 @@ def sell(world, company, value=None):
         company.money += sell_price
         count += 1
     if company.show_messages:
-        strings.send_text(strings.SUCCESS_TRADE
-              % (company.name, count, sell_price, count * sell_price))
+        strings.send_text(strings.SUCCESS_TRADE % (company.name,
+                                                   count,
+                                                   sell_price,
+                                                   count * sell_price))
     company.turn_finished = True
 
 

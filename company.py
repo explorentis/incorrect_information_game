@@ -4,6 +4,7 @@ from random import choice, randint
 
 import strings
 
+
 def genname():
     def genchar():
         return choice('ЦУКЕНГШЩЗХФВАПРОЛДЖЭЯЧСМИТБЮ')
@@ -31,8 +32,8 @@ class Company:
             strings.send_text(strings.MONEY % (self.name, self.money))
             strings.send_text(strings.CREDIT % (self.name, self.credit))
             strings.send_text(strings.PRODUCTS % (self.name, self.goody))
-            strings.send_text(strings.LAST_TURN
-                  % (self.name, self.director.last_command))
+            strings.send_text(strings.LAST_TURN %
+                              (self.name, self.director.last_command))
 
     def get_command(self):
         self.director.get_command()
