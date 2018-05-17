@@ -18,7 +18,7 @@ def run_game(world):
                 if cmd in commands.commands_list.keys():
                     commands.commands_list[cmd](world, c, int(value))
                 else:
-                    print('%s: нет такой команды' % c.name)
+                    strings.send_text(strigs.COMMAND_IS_NOT_EXIST % c.name)
                 if not c.turn_finished:
                     new_turn = False
         new_turn = True

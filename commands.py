@@ -3,6 +3,8 @@
 
 # Список команд управления
 from random import randint
+
+import strings
 # Не забывать про словарь commands в конце этого файла!!!
 
 
@@ -11,17 +13,7 @@ def quit_game(world, company, value=None):
 
 
 def help_game(world, company, value=None):
-    print('Список комманд:\n\
-    q - выход,\n\
-    h - эта помощь,\n\
-    s - информация о Вашем бизнесе,\n\
-    w - ждать следующей даты,\n\
-    gw [сумма] - взять деньги в долг, требуется 1 ход,\n\
-    rw [сумма] - вернуть деньги, требуется 1 ход,\n\
-    b [количество товара] - купить товар, 1 ход,\n\
-    d - продать товар, 1 ход, продать пытаются всегда максимально возможное \
-    количество\n\
-    sf - вывести инфо обо всех организациях')
+    strings.send_text(strings.HELP_TEXT)
 
 
 def get_money(world, company, value=1):
@@ -33,7 +25,7 @@ def get_money(world, company, value=1):
 def return_money(world, company, value=1):
     if company.money < value:
         if company.show_messages:
-            print('%s: Недостаточно денег!' % company.name)
+            strings.send_text(strings.INSUFFICIENT_MONEY % company.name)
         return
     if company.credit < value:
         value = company.credit
@@ -45,7 +37,7 @@ def return_money(world, company, value=1):
 def buy(world, company, value=1):
     if company.money < (value * world.price):
         if company.show_messages:
-            print('%s: Недостаточно денег!' % company.name)
+            strings.send_text(strings.INSUFFICIENT_MONEY % company.name)
         return
     company.money -= (value * world.price)
     company.goody += value
@@ -61,7 +53,7 @@ def sell(world, company, value=None):
         company.money += sell_price
         count += 1
     if company.show_messages:
-        print('%s: Вы продали %d товаров по цене %d на сумму %d'
+        strings.send_text(strings.SUCCESS_TRADE
               % (company.name, count, sell_price, count * sell_price))
     company.turn_finished = True
 

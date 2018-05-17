@@ -17,9 +17,9 @@ class World:
 
     def info(self, forced=False):
         if not self.hideoutput:
-            print('Дата: %d' % self.date)
-            print('Проценты по долгу: %d' % self.percent)
-            print('Цена товара: %d' % self.price)
+            strings.send_text(strings.DATE % self.date)
+            strings.send_text(strings.CREDIT_PERCENT % self.percent)
+            strings.send_text(strings.PRODUCT_PRICE % self.price)
         for c in self.companies:
             c.info(forced)
 
@@ -35,24 +35,30 @@ class World:
             else:
                 c.credit += self.price
             # .
-        # изменение процентов по кредиту в этом ходу
-        self.percent += randint(-5, 5)
-        # изменение стоимости товаров в этом ходу
-        self.price += randint(-3, 3)
-        if self.percent < 0:
-            self.percent = 0
-        if self.price < 1:
-            self.price = 1
+        self.increase_credit_percent(randint(-5, 5))
+        self.increase_product_price(randint(-3, 3))
         self.info()
         # проверка условий победы и поражения
         self.chkwin()
         self.chklose()
 
+    # изменение процентов по кредиту в этом ходу
+    def increase_credit_percent(self, value):
+        self.percent += value
+        if self.percent < 0:
+            self.percent = 0
+
+    def increase_product_price(self, value):
+        # изменение стоимости товаров в этом ходу
+        self.price += value
+        if self.price < 1:
+            self.price = 1
+
     def chkwin(self):
         for c in self.companies:
             if (c.money > 100) and (c.credit == 0):
                 if (c.show_messages):
-                    print('%s: Вы выиграли!' % c.name)
+                    strings.send_text(strings.WIN % c.name)
                 self.winner_is_here = True
                 self.quit = True
 
@@ -60,6 +66,6 @@ class World:
         for c in self.companies:
             if c.credit > 100:
                 if c.show_messages:
-                    print('%s: Вы проиграли!' % c.name)
+                    strings.send_text(strings.LOSE % c.name)
                 self.winner_is_here = False
                 self.quit = True

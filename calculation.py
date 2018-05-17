@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 # Copyright © 2018 Sergei Kuznetsov. All rights reserved.
 # Модуль рассчета оптимальных параметров в заданном алгоритме
-import commands
-
 from company import Company
 
 from director import Director
+
+from game import run_game
+
+import strings
 
 from world import World
 
@@ -16,18 +18,22 @@ def recur_calc(parameters_list,
                current_val,
                nrun,
                logfile,
-               player):
-    for i in range(parameters[parameters_list[pos]][0],
-                   parameters[parameters_list[pos]][1]):
+               player,
+               top_score=[]):
+    top_plays = top_score
+    min_value = parameters[parameters_list[pos]][0]
+    max_value = parameters[parameters_list[pos]][1]
+    for i in range(min_value, max_value):
         current_val[parameters_list[pos]] = i
         if len(parameters_list) - 1 != pos:
-            recur_calc(parameters_list,
-                       pos + 1,
-                       parameters,
-                       current_val,
-                       nrun,
-                       logfile,
-                       player)
+            top_plays = recur_calc(parameters_list,
+                                   pos + 1,
+                                   parameters,
+                                   current_val,
+                                   nrun,
+                                   logfile,
+                                   player,
+                                   top_plays)
         else:
             n = nrun
             wins = 0
@@ -37,44 +43,28 @@ def recur_calc(parameters_list,
                     Company(Director(player, current_val))
                 ], hideoutput=True)
 
-                new_turn = True
-                while not world.quit:
-                    for c in world.companies:
-                        if (((not new_turn) and (not c.turn_finished))
-                                or new_turn):
+                run_game(world)
 
-                            c.get_command()
-                            a = c.director.last_command.split(' ')
-                            cmd = a[0]
-                            if len(a) == 2:
-                                value = a[1]
-                            else:
-                                value = 1
-                            if cmd in commands.commands_list.keys():
-                                commands.commands_list[cmd](world,
-                                                            c,
-                                                            int(value))
-                            else:
-                                print('%s: нет такой команды' % c.name)
-                            if not c.turn_finished:
-                                new_turn = False
-                    new_turn = True
-                    for c in world.companies:
-                        if not c.turn_finished:
-                            new_turn = False
-                    if new_turn:
-                        world.ontime()
-                        for c in world.companies:
-                            c.turn_finished = False
                 if world.winner_is_here:
                     wins += 1
                 else:
                     loses += 1
                 n -= 1
-            print('Побед: %d из %d с заданными параметрами %s'
-                  % (wins, nrun, str(current_val)))
-            logfile.write('Побед: %d из %d с заданными параметрами %s'
-                          % (wins, nrun, str(current_val)))
+            strings.send_text(strings.AI_WIN_RESULT % (wins, nrun, str(current_val), ''))
+            logfile.write(strings.AI_WIN_RESULT
+                          % (wins, nrun, str(current_val), '\n'))
+            if top_plays:
+                if wins < top_plays[0]:
+                    pass
+                else:
+                    if len(top_plays) < 10:
+                        top_plays.append(wins)
+                    else:
+                        top_plays[0] = wins
+            else:
+                top_plays.append(wins)
+            top_plays.sort()
+    return top_plays
 
 
 # players - указатель на функцию игрока
@@ -88,5 +78,13 @@ def calc(player, nruns, parameters):
     current_val = {}
     for key in parameters.keys():
         keys.append(key)
-    recur_calc(keys, 0, parameters, current_val, nruns, logfile, player)
+    top_plays = recur_calc(keys,
+                           0,
+                           parameters,
+                           current_val,
+                           nruns,
+                           logfile,
+                           player)
+    logfile.write(strings.BEST_AI_RESULT % (str(top_plays), '\n'))
+    strings.send_text(strings.BEST_AI_RESULT % (str(top_plays), ''))
     logfile.close()

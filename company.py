@@ -2,6 +2,7 @@
 # Copyright © 2018 Sergei Kuznetsov. All rights reserved.
 from random import choice, randint
 
+import strings
 
 def genname():
     def genchar():
@@ -27,10 +28,10 @@ class Company:
 
     def info(self, forced=False):
         if self.show_messages or forced:
-            print('%s: У Вас %d денег' % (self.name, self.money))
-            print('%s: Ваш долг: %d денег' % (self.name, self.credit))
-            print('%s: Количество товара: %d' % (self.name, self.goody))
-            print('%s: Последнее действие: %s'
+            strings.send_text(strings.MONEY % (self.name, self.money))
+            strings.send_text(strings.CREDIT % (self.name, self.credit))
+            strings.send_text(strings.PRODUCTS % (self.name, self.goody))
+            strings.send_text(strings.LAST_TURN
                   % (self.name, self.director.last_command))
 
     def get_command(self):
